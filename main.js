@@ -76,7 +76,7 @@ class GitHubListener extends BackgroundTaskPlugin {
             msg += `\n${commit_msg}`;
         }
 
-        GLOBAL.logger.debug(`${self._pluginName}: Sending alert.`);
+        GLOBAL.logger.verbose(`${self._pluginName}: Sending alert.`);
 
         self._AKP48.sendMessage(msg, {isAlert: true});
 
@@ -267,7 +267,7 @@ GitHubListener.prototype.handle = function (branch, data) {
 
         proms.push(new Promise(function(resolve){ // jshint ignore:line
           if(npm) {
-            GLOBAL.logger.debug(`${self._pluginName}: Executing npm install for ${files[j]}.`);
+            GLOBAL.logger.verbose(`${self._pluginName}: Executing npm install for ${files[j]}.`);
             shell.exec('npm install', function(){
               resolve();
             });
@@ -296,7 +296,7 @@ GitHubListener.prototype.fetch = function () {
     GLOBAL.logger.error(`${this._pluginName}: Attempted git fetch failed!`);
     return;
   } else {
-    GLOBAL.logger.debug(`${this._pluginName}: Fetched latest code from git.`);
+    GLOBAL.logger.verbose(`${this._pluginName}: Fetched latest code from git.`);
   }
   return true;
 };
@@ -322,14 +322,14 @@ GitHubListener.prototype.checkout = function (branch) {
       GLOBAL.logger.error(`${this._pluginName}: Attempted git reset failed!`);
       return;
     } else {
-      GLOBAL.logger.debug(`${this._pluginName}: Successfully checked out branch "${branch}".`);
+      GLOBAL.logger.verbose(`${this._pluginName}: Successfully checked out branch "${branch}".`);
     }
   }
   if ((this.getBranch() || this.getTag()) && shell.exec(`git reset -q origin/${branch} --hard`).code) {
     GLOBAL.logger.error(`${this._pluginName}: Attempted git reset failed!`);
     return;
   } else {
-    GLOBAL.logger.debug(`${this._pluginName}: Successfully reset to branch "${branch}".`);
+    GLOBAL.logger.verbose(`${this._pluginName}: Successfully reset to branch "${branch}".`);
   }
   return true;
 };
