@@ -13,7 +13,7 @@ class GitHubListener extends BackgroundTaskPlugin {
     super('GitHubListener', AKP48);
     this._config = config;
     if(!this._config) {
-      GLOBAL.logger.info(`${this._pluginName}: No config specified. Generating defaults.`);
+      global.logger.info(`${this._pluginName}: No config specified. Generating defaults.`);
       this._config = {
         port: 4269,
         path: '/github/callback',
@@ -36,17 +36,17 @@ class GitHubListener extends BackgroundTaskPlugin {
         secret: this._config.secret,
         logger: { //define a logger object, so the module doesn't just use console directly.
           log: function(msg){
-            GLOBAL.logger.silly(`${self._pluginName}|GitHubHook: `+msg);
+            global.logger.silly(`${self._pluginName}|GitHubHook: `+msg);
           },
           error: function(msg){
-            GLOBAL.logger.error(`${self._pluginName}|GitHubHook: `+msg);
+            global.logger.error(`${self._pluginName}|GitHubHook: `+msg);
           }
         }
       });
 
-      GLOBAL.logger.info(`${this._pluginName}: Listening for Webhooks from GitHub.`);
-      GLOBAL.logger.debug(`${this._pluginName}: Listening at ${this._config.path} on ${this._config.port}.`);
-      GLOBAL.logger.silly(`${this._pluginName}: Listening for repo ${this._config.repository}, branch ${this._config.branch}.`);
+      global.logger.info(`${this._pluginName}: Listening for Webhooks from GitHub.`);
+      global.logger.debug(`${this._pluginName}: Listening at ${this._config.path} on ${this._config.port}.`);
+      global.logger.silly(`${this._pluginName}: Listening for repo ${this._config.repository}, branch ${this._config.branch}.`);
 
       this._listener.listen();
 
@@ -55,7 +55,7 @@ class GitHubListener extends BackgroundTaskPlugin {
         if(data.deleted) {
           return;
         }
-        GLOBAL.logger.silly(`${self._pluginName}: Received Webhook: ref => ${ref}.`);
+        global.logger.silly(`${self._pluginName}: Received Webhook: ref => ${ref}.`);
 
         var branch = ref.substring(ref.indexOf('/', 5) + 1);
 
@@ -76,7 +76,7 @@ class GitHubListener extends BackgroundTaskPlugin {
             msg += `\n${commit_msg}`;
         }
 
-        GLOBAL.logger.verbose(`${self._pluginName}: Sending alert.`);
+        global.logger.verbose(`${self._pluginName}: Sending alert.`);
 
         self._AKP48.sendMessage(msg, {isAlert: true});
 
@@ -186,21 +186,21 @@ GitHubListener.prototype.shouldUpdate = function (branch) {
 
 GitHubListener.prototype.handle = function (branch, data) {
   var self = this;
-  GLOBAL.logger.info(`${this._pluginName}: Handling Webhook for branch ${branch}.`);
+  global.logger.info(`${this._pluginName}: Handling Webhook for branch ${branch}.`);
 
   if (!shell.which('git') || !this._isRepo) {
-    GLOBAL.logger.debug(`${this._pluginName}: Not a git repo; stopping update.`);
+    global.logger.debug(`${this._pluginName}: Not a git repo; stopping update.`);
     return;
   }
 
   var changing_branch = branch !== this.getBranch();
   var update = this._config.autoUpdate && (data.commits.length !== 0 || changing_branch);
 
-  GLOBAL.logger.silly(`${this._pluginName}: Is changing branch? ${changing_branch}.`);
-  GLOBAL.logger.silly(`${this._pluginName}: Is updating? ${update}.`);
+  global.logger.silly(`${this._pluginName}: Is changing branch? ${changing_branch}.`);
+  global.logger.silly(`${this._pluginName}: Is updating? ${update}.`);
 
   if (!update) {
-    GLOBAL.logger.debug(`${this._pluginName}: Nothing to update; stopping update.`);
+    global.logger.debug(`${this._pluginName}: Nothing to update; stopping update.`);
     return;
   }
 
@@ -235,7 +235,7 @@ GitHubListener.prototype.handle = function (branch, data) {
     }
   }
 
-  GLOBAL.logger.debug(`${this._pluginName}: Updating to branch "${branch}".`);
+  global.logger.debug(`${this._pluginName}: Updating to branch "${branch}".`);
 
   // Fetch, Checkout
   if (!this.checkout(branch)) {
@@ -243,14 +243,14 @@ GitHubListener.prototype.handle = function (branch, data) {
   }
 
   if(npm) {
-    GLOBAL.logger.debug(`${this._pluginName}: Executing npm install.`);
+    global.logger.debug(`${this._pluginName}: Executing npm install.`);
     shell.cd(require('app-root-path').path);
     shell.exec('npm install');
   }
 
   var pluginPath = path.resolve(require('app-root-path').path, 'plugins/*/plugin.json');
   glob(pluginPath, function(err, files) {
-    if(err) {GLOBAL.logger.error(`${this._pluginName}: Glob error: "${err}".`);return;}
+    if(err) {global.logger.error(`${this._pluginName}: Glob error: "${err}".`);return;}
 
     new Promise(function(resolve) {
       //two separate loops because shell is doing something weird if I do it all as one loop.
@@ -267,7 +267,7 @@ GitHubListener.prototype.handle = function (branch, data) {
 
         proms.push(new Promise(function(resolve){ // jshint ignore:line
           if(npm) {
-            GLOBAL.logger.verbose(`${self._pluginName}: Executing npm install for ${files[j]}.`);
+            global.logger.verbose(`${self._pluginName}: Executing npm install for ${files[j]}.`);
             shell.exec('npm install', function(){
               resolve();
             });
@@ -293,10 +293,10 @@ GitHubListener.prototype.handle = function (branch, data) {
 
 GitHubListener.prototype.fetch = function () {
   if(shell.exec('git fetch').code) {
-    GLOBAL.logger.error(`${this._pluginName}: Attempted git fetch failed!`);
+    global.logger.error(`${this._pluginName}: Attempted git fetch failed!`);
     return;
   } else {
-    GLOBAL.logger.verbose(`${this._pluginName}: Fetched latest code from git.`);
+    global.logger.verbose(`${this._pluginName}: Fetched latest code from git.`);
   }
   return true;
 };
@@ -319,17 +319,17 @@ GitHubListener.prototype.checkout = function (branch) {
   }
   if (this.getBranch() !== branch) {
     if (shell.exec(`git checkout -q ${branch}`).code) {
-      GLOBAL.logger.error(`${this._pluginName}: Attempted git reset failed!`);
+      global.logger.error(`${this._pluginName}: Attempted git reset failed!`);
       return;
     } else {
-      GLOBAL.logger.verbose(`${this._pluginName}: Successfully checked out branch "${branch}".`);
+      global.logger.verbose(`${this._pluginName}: Successfully checked out branch "${branch}".`);
     }
   }
   if ((this.getBranch() || this.getTag()) && shell.exec(`git reset -q origin/${branch} --hard`).code) {
-    GLOBAL.logger.error(`${this._pluginName}: Attempted git reset failed!`);
+    global.logger.error(`${this._pluginName}: Attempted git reset failed!`);
     return;
   } else {
-    GLOBAL.logger.verbose(`${this._pluginName}: Successfully reset to branch "${branch}".`);
+    global.logger.verbose(`${this._pluginName}: Successfully reset to branch "${branch}".`);
   }
   return true;
 };
