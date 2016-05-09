@@ -352,7 +352,19 @@ GitHubListener.prototype.checkout = function (branch) {
 };
 
 GitHubListener.prototype.shouldSendAlert = function (hookType) {
-  if(!this._config.events) {return true;} // legacy config didn't have events object.
+  if(!this._config.events) { // legacy config didn't have events object.
+    this._config.events = {
+      push: true,
+      pull_request: true,
+      issues: true,
+      issue_comment: true,
+      gollum: true,
+      fork: true,
+      watch: true
+    };
+    return true;
+  }
+
   if(this._config.events[hookType]) {return true;} // hookType is enabled in config.
   return false;
 };
