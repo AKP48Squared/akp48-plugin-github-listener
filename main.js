@@ -21,6 +21,15 @@ class GitHubListener extends BackgroundTaskPlugin {
         repository: 'AKP48Squared',
         branch: 'master',
         autoUpdate: false,
+        events: {
+          push: true,
+          pull_request: true,
+          issues: true,
+          issue_comment: true,
+          gollum: true,
+          fork: true,
+          watch: true
+        },
         enabled: true
       };
 
@@ -77,9 +86,10 @@ class GitHubListener extends BackgroundTaskPlugin {
             msg += `\n${commit_msg}`;
         }
 
-        global.logger.verbose(`${self._pluginName}: Sending alert.`);
-
-        self._AKP48.sendMessage(msg, {isAlert: true});
+        if(self.shouldSendAlert('push')) {
+          global.logger.verbose(`${self._pluginName}: Sending alert.`);
+          self._AKP48.sendMessage(msg, {isAlert: true});
+        }
 
         if(self.shouldUpdate(branch) && repo === this._config.repository) {
           self.handle(branch, data);
@@ -87,6 +97,7 @@ class GitHubListener extends BackgroundTaskPlugin {
       });
 
       this._listener.on(`pull_request`, function(repo, ref, data) {
+        if(!self.shouldSendAlert('pull_request')) { return; }
         if(data.action === 'closed' && data.pull_request.merged) {
           data.action = 'merged';
         }
@@ -99,6 +110,7 @@ class GitHubListener extends BackgroundTaskPlugin {
       });
 
       this._listener.on(`issues`, function(repo, ref, data) {
+        if(!self.shouldSendAlert('issues')) { return; }
         if(data.issue.title.length >= 80) {
           data.issue.title = data.issue.title.substring(0,80) + '...';
         }
@@ -115,6 +127,7 @@ class GitHubListener extends BackgroundTaskPlugin {
       });
 
       this._listener.on(`issue_comment`, function(repo, ref, data) {
+        if(!self.shouldSendAlert('issue_comment')) { return; }
         if(data.comment.body.length >= 80) {
           data.comment.body = data.comment.body.substring(0,80) + '...';
         }
@@ -124,6 +137,7 @@ class GitHubListener extends BackgroundTaskPlugin {
       });
 
       this._listener.on(`gollum`, function(repo, ref, data) {
+        if(!self.shouldSendAlert('gollum')) { return; }
         for (var i = 0; i < data.pages.length; i++) {
           var pg = data.pages[i];
           var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} Wiki Page ${c.bold(pg.page_name)} ${pg.action}. (${pg.html_url})`;
@@ -132,12 +146,14 @@ class GitHubListener extends BackgroundTaskPlugin {
       });
 
       this._listener.on(`fork`, function(repo, ref, data) {
+        if(!self.shouldSendAlert('fork')) { return; }
         var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} New Fork! ${c.bold(data.sender.login)} forked the repo! (${data.forkee.html_url})`;
 
         self._AKP48.sendMessage(out, {isAlert: true});
       });
 
       this._listener.on(`watch`, function(repo, ref, data) {
+        if(!self.shouldSendAlert('watch')) { return; }
         var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} New Star! ${c.bold(data.sender.login)} starred the repo!`;
 
         self._AKP48.sendMessage(out, {isAlert: true});
@@ -333,6 +349,12 @@ GitHubListener.prototype.checkout = function (branch) {
     global.logger.verbose(`${this._pluginName}: Successfully reset to branch "${branch}".`);
   }
   return true;
+};
+
+GitHubListener.prototype.shouldSendAlert = function (hookType) {
+  if(!this._config.events) {return true;} // legacy config didn't have events object.
+  if(this._config.events[hookType]) {return true;} // hookType is enabled in config.
+  return false;
 };
 
 //called when we are told we're unloading.
