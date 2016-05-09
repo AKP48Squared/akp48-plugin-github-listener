@@ -28,7 +28,8 @@ class GitHubListener extends BackgroundTaskPlugin {
           issue_comment: true,
           gollum: true,
           fork: true,
-          watch: true
+          watch: true,
+          repository: true
         },
         enabled: true
       };
@@ -367,8 +368,10 @@ GitHubListener.prototype.shouldSendAlert = function (hookType) {
       issue_comment: true,
       gollum: true,
       fork: true,
-      watch: true
+      watch: true,
+      repository: true
     };
+    this._AKP48.saveConfig(this._config, 'github-listener');
     return true;
   }
 
