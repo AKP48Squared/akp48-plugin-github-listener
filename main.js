@@ -158,6 +158,13 @@ class GitHubListener extends BackgroundTaskPlugin {
 
         self._AKP48.sendMessage(out, {isAlert: true});
       });
+
+      this._listener.on(`repository`, function(repo, ref, data) {
+        if(!self.shouldSendAlert('watch')) { return; }
+        var out = `${c.pink('[GitHub]')} ${c.green(`[${data.organization.login} Organization]`)} Repository ${c.bold(data.repository.name)} ${data.action} by ${c.bold(data.sender.login)}. (${data.repository.html_url})`;
+
+        self._AKP48.sendMessage(out, {isAlert: true});
+      });
     }
   }
 }
