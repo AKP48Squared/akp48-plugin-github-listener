@@ -51,7 +51,7 @@ class GitHubListener extends BackgroundTaskPlugin {
       this._listener.listen();
 
       var self = this;
-      this._listener.on(`push:${this._config.repository}`, function (ref, data) {
+      this._listener.on(`push`, function (repo, ref, data) {
         if(data.deleted) {
           return;
         }
@@ -63,8 +63,9 @@ class GitHubListener extends BackgroundTaskPlugin {
         var commits = `${data.commits.length} commit`.pluralize(data.commits.length);
         var url = data.compare;
 
-        var msg = `${c.pink('[GitHub]')} ${commits} ${data.forced && !data.created ? 'force ' : ''}pushed to ${data.created ? 'new ' : ''}`;
-        msg += `${data.ref.startsWith('refs/tags/') ? 'tag ' : 'branch '}${c.bold(branch)} by ${data.pusher.name} `;
+        // TODO: confusing code? Template literal inside a template literal. Template-ception.
+        var msg = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} ${commits} ${data.forced && !data.created ? 'force ' : ''}pushed to ${data.created ? 'new ' : ''}`;
+        msg += `${data.ref.startsWith('refs/tags/') ? 'tag' : 'branch'} ${repo}:${c.bold(branch)} by ${data.pusher.name}. `;
         msg += `(${url})`;
 
         for (var i = 0; i < data.commits.length && i < 3; i++) {
@@ -80,24 +81,24 @@ class GitHubListener extends BackgroundTaskPlugin {
 
         self._AKP48.sendMessage(msg, {isAlert: true});
 
-        if(self.shouldUpdate(branch)) {
+        if(self.shouldUpdate(branch) && repo === this._config.repository) {
           self.handle(branch, data);
         }
       });
 
-      this._listener.on(`pull_request:${this._config.repository}`, function(ref, data) {
+      this._listener.on(`pull_request`, function(repo, ref, data) {
         if(data.action === 'closed' && data.pull_request.merged) {
           data.action = 'merged';
         }
         if(data.pull_request.title.length >= 80) {
           data.pull_request.title = data.pull_request.title.substring(0,80) + '...';
         }
-        var out = `${c.pink('[GitHub]')} Pull Request ${data.number} ${data.action}. Title: ${data.pull_request.title}`;
+        var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} Pull Request ${data.number} ${data.action}. Title: ${data.pull_request.title}`;
 
         self._AKP48.sendMessage(out, {isAlert: true});
       });
 
-      this._listener.on(`issues:${this._config.repository}`, function(ref, data) {
+      this._listener.on(`issues`, function(repo, ref, data) {
         if(data.issue.title.length >= 80) {
           data.issue.title = data.issue.title.substring(0,80) + '...';
         }
@@ -108,36 +109,36 @@ class GitHubListener extends BackgroundTaskPlugin {
         if(data.action === 'labeled' || data.action === 'unlabeled') {
           data.action += ` ${data.label.name}`;
         }
-        var out = `${c.pink('[GitHub]')} Issue ${data.issue.number} ${data.action}. Title: ${data.issue.title}`;
+        var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} Issue ${data.issue.number} ${data.action}. Title: ${data.issue.title}`;
 
         self._AKP48.sendMessage(out, {isAlert: true});
       });
 
-      this._listener.on(`issue_comment:${this._config.repository}`, function(ref, data) {
+      this._listener.on(`issue_comment`, function(repo, ref, data) {
         if(data.comment.body.length >= 80) {
           data.comment.body = data.comment.body.substring(0,80) + '...';
         }
-        var out = `${c.pink('[GitHub]')} New comment on issue ${data.issue.number} by ${c.bold(data.comment.user.login)}. ${data.comment.body} (${data.comment.html_url})`;
+        var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} New comment on issue ${data.issue.number} by ${c.bold(data.comment.user.login)}. ${data.comment.body} (${data.comment.html_url})`;
 
         self._AKP48.sendMessage(out, {isAlert: true});
       });
 
-      this._listener.on(`gollum:${this._config.repository}`, function(ref, data) {
+      this._listener.on(`gollum`, function(repo, ref, data) {
         for (var i = 0; i < data.pages.length; i++) {
           var pg = data.pages[i];
-          var out = `${c.pink('[GitHub]')} Wiki Page ${c.bold(pg.page_name)} ${pg.action}. (${pg.html_url})`;
+          var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} Wiki Page ${c.bold(pg.page_name)} ${pg.action}. (${pg.html_url})`;
           self._AKP48.sendMessage(out, {isAlert: true});
         }
       });
 
-      this._listener.on(`fork:${this._config.repository}`, function(ref, data) {
-        var out = `${c.pink('[GitHub]')} New Fork! ${c.bold(data.sender.login)} forked the repo! (${data.forkee.html_url})`;
+      this._listener.on(`fork`, function(repo, ref, data) {
+        var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} New Fork! ${c.bold(data.sender.login)} forked the repo! (${data.forkee.html_url})`;
 
         self._AKP48.sendMessage(out, {isAlert: true});
       });
 
-      this._listener.on(`watch:${this._config.repository}`, function(ref, data) {
-        var out = `${c.pink('[GitHub]')} New Star! ${c.bold(data.sender.login)} starred the repo!`;
+      this._listener.on(`watch`, function(repo, ref, data) {
+        var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} New Star! ${c.bold(data.sender.login)} starred the repo!`;
 
         self._AKP48.sendMessage(out, {isAlert: true});
       });
