@@ -46,10 +46,10 @@ class GitHubListener extends BackgroundTaskPlugin {
         secret: this._config.secret,
         logger: { //define a logger object, so the module doesn't just use console directly.
           log: function(msg){
-            global.logger.silly(`${self._pluginName}|GitHubHook: `+msg);
+            global.logger.silly(`${self._pluginName}|GitHubHook: ${msg}`);
           },
           error: function(msg){
-            global.logger.error(`${self._pluginName}|GitHubHook: `+msg);
+            global.logger.error(`${self._pluginName}|GitHubHook: ${msg}`);
           }
         }
       });
@@ -74,7 +74,7 @@ class GitHubListener extends BackgroundTaskPlugin {
         var url = data.compare;
 
         // TODO: confusing code? Template literal inside a template literal. Template-ception.
-        var msg = `${c.pink('[GitHub]')} ${c.green(`[${repo.replace(/akp48-plugin-/i, '')}]`)} ${commits} ${data.forced && !data.created ? 'force ' : ''}pushed to ${data.created ? 'new ' : ''}`;
+        var msg = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} ${commits} ${data.forced && !data.created ? 'force ' : ''}pushed to ${data.created ? 'new ' : ''}`;
         msg += `${data.ref.startsWith('refs/tags/') ? 'tag' : 'branch'} ${c.bold(branch)} by ${data.pusher.name}. `;
         msg += `(${url})`;
 
@@ -105,7 +105,7 @@ class GitHubListener extends BackgroundTaskPlugin {
         if(data.pull_request.title.length >= 80) {
           data.pull_request.title = data.pull_request.title.substring(0,80) + '...';
         }
-        var out = `${c.pink('[GitHub]')} ${c.green(`[${repo.replace(/akp48-plugin-/i, '')}]`)} Pull Request ${data.number} ${data.action}. Title: ${data.pull_request.title}`;
+        var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} Pull Request ${data.number} ${data.action}. Title: ${data.pull_request.title}`;
 
         self._AKP48.sendMessage(out, {isAlert: true});
       });
@@ -122,7 +122,7 @@ class GitHubListener extends BackgroundTaskPlugin {
         if(data.action === 'labeled' || data.action === 'unlabeled') {
           data.action += ` ${data.label.name}`;
         }
-        var out = `${c.pink('[GitHub]')} ${c.green(`[${repo.replace(/akp48-plugin-/i, '')}]`)} Issue ${data.issue.number} ${data.action}. Title: ${data.issue.title}`;
+        var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} Issue ${data.issue.number} ${data.action}. Title: ${data.issue.title}`;
 
         self._AKP48.sendMessage(out, {isAlert: true});
       });
@@ -132,7 +132,7 @@ class GitHubListener extends BackgroundTaskPlugin {
         if(data.comment.body.length >= 80) {
           data.comment.body = data.comment.body.substring(0,80) + '...';
         }
-        var out = `${c.pink('[GitHub]')} ${c.green(`[${repo.replace(/akp48-plugin-/i, '')}]`)} New comment on issue ${data.issue.number} by ${c.bold(data.comment.user.login)}. ${data.comment.body} (${data.comment.html_url})`;
+        var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} New comment on issue ${data.issue.number} by ${c.bold(data.comment.user.login)}. ${data.comment.body} (${data.comment.html_url})`;
 
         self._AKP48.sendMessage(out, {isAlert: true});
       });
@@ -141,21 +141,21 @@ class GitHubListener extends BackgroundTaskPlugin {
         if(!self.shouldSendAlert('gollum')) { return; }
         for (var i = 0; i < data.pages.length; i++) {
           var pg = data.pages[i];
-          var out = `${c.pink('[GitHub]')} ${c.green(`[${repo.replace(/akp48-plugin-/i, '')}]`)} Wiki Page ${c.bold(pg.page_name)} ${pg.action}. (${pg.html_url})`;
+          var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} Wiki Page ${c.bold(pg.page_name)} ${pg.action}. (${pg.html_url})`;
           self._AKP48.sendMessage(out, {isAlert: true});
         }
       });
 
       this._listener.on(`fork`, function(repo, ref, data) {
         if(!self.shouldSendAlert('fork')) { return; }
-        var out = `${c.pink('[GitHub]')} ${c.green(`[${repo.replace(/akp48-plugin-/i, '')}]`)} New Fork! ${c.bold(data.sender.login)} forked the repo! (${data.forkee.html_url})`;
+        var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} New Fork! ${c.bold(data.sender.login)} forked the repo! (${data.forkee.html_url})`;
 
         self._AKP48.sendMessage(out, {isAlert: true});
       });
 
       this._listener.on(`watch`, function(repo, ref, data) {
         if(!self.shouldSendAlert('watch')) { return; }
-        var out = `${c.pink('[GitHub]')} ${c.green(`[${repo.replace(/akp48-plugin-/i, '')}]`)} New Star! ${c.bold(data.sender.login)} starred the repo!`;
+        var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} New Star! ${c.bold(data.sender.login)} starred the repo!`;
 
         self._AKP48.sendMessage(out, {isAlert: true});
       });
