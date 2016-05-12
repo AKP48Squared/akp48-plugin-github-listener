@@ -10,4 +10,4 @@ github-listener will create a default configuration when it first starts up. Aft
 
 # Issues
 
-If you come across any issues, you can report them on this GitHub repo [here](https://github.com/AKP48Squared/akp48-plugin-github-listener/issues).
+If you come across any issues, you can report them on this GitHub repo [here](https://github.com/AKP48Squared/github-listener/issues).

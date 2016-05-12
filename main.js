@@ -1,5 +1,4 @@
 'use strict';
-const BackgroundTaskPlugin = require('../../lib/BackgroundTaskPlugin');
 const c = require('irc-colors');
 const getRepoInfo = require('git-repo-info');
 const GitHubHook = require('githubhook');
@@ -8,7 +7,7 @@ const path = require('path');
 const Promise = require('bluebird'); //jshint ignore:line
 const shell = require('shelljs');
 
-class GitHubListener extends BackgroundTaskPlugin {
+class GitHubListener extends global.AKP48.pluginTypes.BackgroundTask {
   constructor(AKP48, config) {
     super('GitHubListener', AKP48);
     this._config = config;

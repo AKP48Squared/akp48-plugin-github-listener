@@ -18,12 +18,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AKP48Squared/akp48-plugin-github-listener.git"
+    "url": "git+https://github.com/AKP48Squared/github-listener.git"
   },
   "bugs": {
-    "url": "https://github.com/AKP48Squared/akp48-plugin-github-listener/issues"
+    "url": "https://github.com/AKP48Squared/github-listener/issues"
   },
-  "homepage": "https://github.com/AKP48Squared/akp48-plugin-github-listener",
+  "homepage": "https://github.com/AKP48Squared/github-listener",
   "dependencies": {
     "git-repo-info": "^1.1.2",
     "githubhook": "^1.5.1"
