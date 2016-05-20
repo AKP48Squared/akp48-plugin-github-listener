@@ -391,3 +391,4 @@ GitHubListener.prototype.unload = function () {
 };
 
 module.exports = GitHubListener;
+module.exports.type = 'BackgroundTask';
