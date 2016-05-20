@@ -1,14 +1,12 @@
 {
   "name": "akp48-plugin-github-listener",
-  "version": "1.0.6",
+  "version": "1.0.5",
   "description": "GitHub Listener plugin for AKP48.",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "preversion": "git checkout master && git pull && npm ls",
-    "publish-patch": "npm run preversion && npm version patch && git push origin master --tags && npm publish",
-    "publish-minor": "npm run preversion && npm version minor && git push origin master --tags && npm publish",
-    "publish-major": "npm run preversion && npm version major && git push origin master --tags && npm publish"
+    "preversion": "git checkout master && git pull --ff-only",
+    "postversion": "git push origin master --tags && npm publish"
   },
   "author": "Austin Peterson <austin@akpwebdesign.com> (http://akpwebdesign.com)",
   "contributors": [
