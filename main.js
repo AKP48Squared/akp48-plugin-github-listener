@@ -7,31 +7,32 @@ const path = require('path');
 const Promise = require('bluebird'); //jshint ignore:line
 const shell = require('shelljs');
 
+var defaultConfig = {
+  port: 4269,
+  path: '/github/callback',
+  secret: '',
+  repository: 'AKP48Squared',
+  branch: 'master',
+  autoUpdate: false,
+  events: {
+    push: true,
+    commit_comment: true,
+    pull_request: true,
+    issues: true,
+    issue_comment: true,
+    gollum: true,
+    fork: true,
+    watch: true,
+    repository: true
+  },
+  enabled: true
+};
+
 class GitHubListener extends global.AKP48.pluginTypes.BackgroundTask {
   constructor(AKP48, config) {
-    super('GitHubListener', AKP48, config);
-    if(!this._config) {
-      global.logger.info(`${this._pluginName}: No config specified. Generating defaults.`);
-      this._config = {
-        port: 4269,
-        path: '/github/callback',
-        secret: '',
-        repository: 'AKP48Squared',
-        branch: 'master',
-        autoUpdate: false,
-        events: {
-          push: true,
-          commit_comment: true,
-          pull_request: true,
-          issues: true,
-          issue_comment: true,
-          gollum: true,
-          fork: true,
-          watch: true,
-          repository: true
-        },
-        enabled: true
-      };
+    super('GitHubListener', AKP48, config || defaultConfig);
+    if(!config) {
+      global.logger.info(`${this._pluginName}: No config specified. Saving defaults.`);
 
       AKP48.saveConfig(this._config, 'github-listener');
     }
@@ -350,17 +351,7 @@ GitHubListener.prototype.checkout = function (branch) {
 
 GitHubListener.prototype.shouldSendAlert = function (hookType) {
   if(!this._config.events || !this._config.events.hasOwnProperty('commit_comment')) { // legacy config didn't have events object.
-    this._config.events = this._config.events || {
-      push: true,
-      commit_comment: true,
-      pull_request: true,
-      issues: true,
-      issue_comment: true,
-      gollum: true,
-      fork: true,
-      watch: true,
-      repository: true
-    };
+    this._config.events = this._config.events || defaultConfig.events;
     if (!this._config.events.hasOwnProperty('commit_comment')) { this._config.events.commit_comment = true; }
     this._AKP48.saveConfig(this._config, 'github-listener');
     return true;
