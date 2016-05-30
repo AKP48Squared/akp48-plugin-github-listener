@@ -30,7 +30,7 @@ class GitHubListener extends global.AKP48.pluginTypes.BackgroundTask {
           watch: true,
           repository: true
         },
-        enabled: false
+        enabled: true
       };
 
       AKP48.saveConfig(this._config, 'github-listener');
