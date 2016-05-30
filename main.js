@@ -104,7 +104,7 @@ class GitHubListener extends global.AKP48.pluginTypes.BackgroundTask {
         }
         var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} Pull Request ${data.number} ${data.action}. Title: ${data.pull_request.title}`;
 
-        AKP48.emit("alert", out);
+        AKP48.emit('alert', out);
       }).on(`issues`, function(repo, ref, data) {
         if(!self.shouldSendAlert('issues')) { return; }
         if(data.issue.title.length >= 80) {
@@ -119,7 +119,7 @@ class GitHubListener extends global.AKP48.pluginTypes.BackgroundTask {
         }
         var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} Issue ${data.issue.number} ${data.action}. Title: ${data.issue.title}`;
 
-        AKP48.emit("alert", out);
+        AKP48.emit('alert', out);
       }).on(`issue_comment`, function(repo, ref, data) {
         if(!self.shouldSendAlert('issue_comment')) { return; }
         if(data.comment.body.length >= 80) {
@@ -127,33 +127,33 @@ class GitHubListener extends global.AKP48.pluginTypes.BackgroundTask {
         }
         var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} New comment on issue ${data.issue.number} by ${c.bold(data.comment.user.login)}. ${data.comment.body} (${data.comment.html_url})`;
 
-        AKP48.emit("alert", out);
+        AKP48.emit('alert', out);
       }).on(`gollum`, function(repo, ref, data) {
         if(!self.shouldSendAlert('gollum')) { return; }
         for (var i = 0; i < data.pages.length; i++) {
           var pg = data.pages[i];
           var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} Wiki Page ${c.bold(pg.page_name)} ${pg.action}. (${pg.html_url})`;
-          AKP48.emit("alert", out);
+          AKP48.emit('alert', out);
         }
       }).on(`fork`, function(repo, ref, data) {
         if(!self.shouldSendAlert('fork')) { return; }
         var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} New Fork! ${c.bold(data.sender.login)} forked the repo! (${data.forkee.html_url})`;
 
-        AKP48.emit("alert", out);
+        AKP48.emit('alert', out);
       }).on(`watch`, function(repo, ref, data) {
         if(!self.shouldSendAlert('watch')) { return; }
         var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} New Star! ${c.bold(data.sender.login)} starred the repo!`;
 
-        AKP48.emit("alert", out);
+        AKP48.emit('alert', out);
       }).on(`repository`, function(repo, ref, data) {
         if(!self.shouldSendAlert('watch')) { return; }
         var out = `${c.pink('[GitHub]')} ${c.green(`[${data.organization.login} Organization]`)} Repository ${c.bold(data.repository.name)} ${data.action} by ${c.bold(data.sender.login)}. (${data.repository.html_url})`;
 
-        AKP48.emit("alert", out);
+        AKP48.emit('alert', out);
       }).on('commit_comment', function (repo, ref, data) {
         if (!self.shouldSendAlert('commit_comment')) { return; }
-        var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]` ${data.comment.user.login} left a comment. ${data.comment.html_url})}`;
-        AKP48.emit("alert", out);
+        var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}] ${data.comment.user.login} left a comment. ${data.comment.html_url}`)}`;
+        AKP48.emit('alert', out);
       });
     }
   }
@@ -361,7 +361,7 @@ GitHubListener.prototype.shouldSendAlert = function (hookType) {
       watch: true,
       repository: true
     };
-    if (!this.config.events.hasOwnProperty('commit_comment')) this.config.events.commit_comment = true;
+    if (!this.config.events.hasOwnProperty('commit_comment')) { this.config.events.commit_comment = true; }
     this._AKP48.saveConfig(this._config, 'github-listener');
     return true;
   }
