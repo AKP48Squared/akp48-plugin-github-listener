@@ -349,7 +349,7 @@ GitHubListener.prototype.checkout = function (branch) {
 };
 
 GitHubListener.prototype.shouldSendAlert = function (hookType) {
-  if(!this._config.events || !this.config.events.hasOwnProperty('commit_comment')) { // legacy config didn't have events object.
+  if(!this._config.events || !this._config.events.hasOwnProperty('commit_comment')) { // legacy config didn't have events object.
     this._config.events = this._config.events || {
       push: true,
       commit_comment: true,
@@ -361,7 +361,7 @@ GitHubListener.prototype.shouldSendAlert = function (hookType) {
       watch: true,
       repository: true
     };
-    if (!this.config.events.hasOwnProperty('commit_comment')) { this.config.events.commit_comment = true; }
+    if (!this._config.events.hasOwnProperty('commit_comment')) { this._config.events.commit_comment = true; }
     this._AKP48.saveConfig(this._config, 'github-listener');
     return true;
   }
