@@ -1,6 +1,6 @@
 {
   "name": "akp48-plugin-github-listener",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "GitHub Listener plugin for AKP48.",
   "main": "main.js",
   "scripts": {
