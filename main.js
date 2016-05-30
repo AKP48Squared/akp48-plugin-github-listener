@@ -152,7 +152,7 @@ class GitHubListener extends global.AKP48.pluginTypes.BackgroundTask {
         AKP48.emit('alert', out);
       }).on('commit_comment', function (repo, ref, data) {
         if (!self.shouldSendAlert('commit_comment')) { return; }
-        var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}] ${data.comment.user.login} left a comment. ${data.comment.html_url}`)}`;
+        var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]`)} ${data.comment.user.login} left a comment. ${data.comment.html_url}`;
         AKP48.emit('alert', out);
       });
     }
