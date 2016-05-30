@@ -164,6 +164,10 @@ class GitHubListener extends global.AKP48.pluginTypes.BackgroundTask {
         var out = `${c.pink('[GitHub]')} ${c.green(`[${data.organization.login} Organization]`)} Repository ${c.bold(data.repository.name)} ${data.action} by ${c.bold(data.sender.login)}. (${data.repository.html_url})`;
 
         self._AKP48.sendMessage(out, {isAlert: true});
+      }).on('commit_comment', function (repo, ref, data) {
+        if (!self.shouldSendAlert('commit_comment')) { return; }
+        var out = `${c.pink('[GitHub]')} ${c.green(`[${repo}]` ${data.comment.user.login} left a comment. ${data.comment.html_url})}`;
+        AKP48.emit("alert", out);
       });
     }
   }
@@ -359,9 +363,10 @@ GitHubListener.prototype.checkout = function (branch) {
 };
 
 GitHubListener.prototype.shouldSendAlert = function (hookType) {
-  if(!this._config.events) { // legacy config didn't have events object.
-    this._config.events = {
+  if(!this._config.events || !this.config.events.hasOwnProperty('commit_comment')) { // legacy config didn't have events object.
+    this._config.events = this._config.events || {
       push: true,
+      commit_comment: true,
       pull_request: true,
       issues: true,
       issue_comment: true,
@@ -370,6 +375,7 @@ GitHubListener.prototype.shouldSendAlert = function (hookType) {
       watch: true,
       repository: true
     };
+    if (!this.config.events.hasOwnProperty('commit_comment')) this.config.events.commit_comment = true;
     this._AKP48.saveConfig(this._config, 'github-listener');
     return true;
   }
