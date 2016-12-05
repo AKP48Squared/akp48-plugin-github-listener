@@ -33,10 +33,11 @@ class GitHubListener extends global.AKP48.pluginTypes.Generic {
   }
 
   load() {
-    if(!this.config) {
+    if(Object.keys(this._config).length === 0 && this._config.constructor === Object) {
       global.logger.info(`${this.name}: No config specified. Saving defaults.`);
 
-      AKP48.saveConfig(this.config, 'github-listener');
+      AKP48.saveConfig(defaultConfig, 'github-listener');
+      this._config = defaultConfig;
     }
 
     this._isRepo = (getRepoInfo._findRepo('.') !== null);
