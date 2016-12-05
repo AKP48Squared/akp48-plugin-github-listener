@@ -6,40 +6,12 @@ const path = require('path');
 const Promise = require('bluebird'); //jshint ignore:line
 const shell = require('shelljs');
 
-var defaultConfig = {
-  port: 4269,
-  path: '/github/callback',
-  secret: '',
-  repository: 'AKP48Squared',
-  branch: 'master',
-  autoUpdate: false,
-  events: {
-    push: true,
-    commit_comment: true,
-    pull_request: true,
-    issues: true,
-    issue_comment: true,
-    gollum: true,
-    fork: true,
-    watch: true,
-    repository: true
-  },
-  enabled: true
-};
-
 class GitHubListener extends global.AKP48.pluginTypes.Generic {
   constructor(AKP48) {
     super(AKP48, 'GitHubListener');
   }
 
   load() {
-    if(Object.keys(this._config).length === 0 && this._config.constructor === Object) {
-      global.logger.info(`${this.name}: No config specified. Saving defaults.`);
-
-      AKP48.saveConfig(defaultConfig, 'github-listener');
-      this._config = defaultConfig;
-    }
-
     this._isRepo = (getRepoInfo._findRepo('.') !== null);
 
     if(this.config.enabled) {
@@ -195,6 +167,29 @@ class GitHubListener extends global.AKP48.pluginTypes.Generic {
         AKP48.sendAlert(out);
       });
     }
+  }
+
+  getDefaultConfig() {
+    return {
+      port: 4269,
+      path: '/github/callback',
+      secret: '',
+      repository: 'AKP48Squared',
+      branch: 'master',
+      autoUpdate: false,
+      events: {
+        push: true,
+        commit_comment: true,
+        pull_request: true,
+        issues: true,
+        issue_comment: true,
+        gollum: true,
+        fork: true,
+        watch: true,
+        repository: true
+      },
+      enabled: true
+    };
   }
 }
 
@@ -391,7 +386,7 @@ GitHubListener.prototype.shouldSendAlert = function (hookType) {
   if(!this.config.events || !this.config.events.hasOwnProperty('commit_comment')) { // legacy config didn't have events object.
     this.config.events = this.config.events || defaultConfig.events;
     if (!this.config.events.hasOwnProperty('commit_comment')) { this.config.events.commit_comment = true; }
-    this._AKP48.saveConfig(this.config, 'github-listener');
+    this._AKP48.saveConfig(this.config, 'GithubListener');
     return true;
   }
 
@@ -412,5 +407,3 @@ GitHubListener.prototype.unload = function () {
 };
 
 module.exports = GitHubListener;
-module.exports.type = 'BackgroundTask';
-module.exports.pluginName = 'github-listener';
