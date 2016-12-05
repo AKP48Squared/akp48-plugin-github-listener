@@ -50,8 +50,8 @@ class GitHubListener extends global.AKP48.pluginTypes.Generic {
 
         var msg = [];
         msg.push({style: 'pink', text: '[Github] '});
-        msg.push({style: 'green', text: `[${repo}] `});
-        msg.push(`${commits} ${data.forced && !data.created ? 'force ' : ''}pushed to ${data.created ? 'new ' : ''}`);
+        msg.push({style: 'green', text: `[${repo}]`});
+        msg.push(` ${commits} ${data.forced && !data.created ? 'force ' : ''}pushed to ${data.created ? 'new ' : ''}`);
         msg.push(`${data.ref.startsWith('refs/tags/') ? 'tag' : 'branch'} `);
         msg.push({style: 'bold', text: `${branch} `});
         msg.push(`by ${data.pusher.name}. `);
@@ -61,6 +61,7 @@ class GitHubListener extends global.AKP48.pluginTypes.Generic {
           var _c = data.commits[data.commits.length - 1 - i];
           var _m = _c.message;
           var end = _m.indexOf('\n');
+          msg.push('\n');
           msg.push({style: 'green', text: `[${_c.id.substring(0,7)}] `});
           msg.push(`${_c.author.username}: ${_m.substring(0, end === -1 ? _m.length : end)}`);
         }
